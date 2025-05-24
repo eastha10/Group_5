@@ -3,13 +3,14 @@
 <head>
 	<script src = "https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<link type = "text/css" rel = "stylesheet" href = "game.css">
-	<script src = "game.js"></script>
-	<title>제목</title>
+	<title>성 지키기 게임</title>
 </head>
 <body>
-	<div id = "main_menu"></div>
-	<div class = "story"></div>
-	<div id = "setting"></div>
-	<div id = "game"></div>
+	<div id="ui">
+    	<span>❤️ 생명: <span id="life">3</span></span>
+    	<span> | 🌊 웨이브: <span id="wave">1</span></span>
+  	</div>
+  	<canvas id="gameCanvas"></canvas>
+  	<script src="game.js"></script>
 </body>
 </html>
