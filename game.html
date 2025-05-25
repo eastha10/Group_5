@@ -1,15 +1,79 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<script src = "https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<link type = "text/css" rel = "stylesheet" href = "game.css">
-	<script src = "game.js"></script>
-	<title>제목</title>
-</head>
-<body>
-	<div id = "main_menu"></div>
-	<div class = "story"></div>
-	<div id = "setting"></div>
-	<div id = "game"></div>
-</body>
+  <head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="reset.css" />
+    <link rel="stylesheet" href="game.css" />
+    <script src="game.js"></script>
+    <title>성 지키기 게임</title>
+  </head>
+  <body>
+    <div id="start-wrapper">
+      <div class="start-container">
+        <img src="start-background.gif" class="start-bg" alt="배경" />
+        <h1 class="start-logo">GAME LOGO</h1>
+        <div class="menu">
+          <button class="menu-btn">GAME START</button>
+          <button class="menu-btn">OPTIONS</button>
+        </div>
+      </div>
+    </div>
+    <div id="setting-wrapper" class="hidden">
+      <div class="overlay"></div>
+      <input id="tab1" type="radio" name="tab" checked />
+      <input id="tab2" type="radio" name="tab" />
+      <input id="tab3" type="radio" name="tab" />
+      <nav class="tabs">
+        <label class="tab" for="tab1">Background Music</label>
+        <label class="tab" for="tab2">Job</label>
+        <label class="tab" for="tab3">Castle Skin</label>
+      </nav>
+      <div class="setting-container">
+        <article class="tab-content1">
+          <div class="bgm-selection">
+            <button class="bgm-before"><img src="left.svg" /></button>
+            <div class="bgm-conainer">
+              <p class="bgm-name">stealth battle</p>
+              <audio
+                id="bgm"
+                src="stealth-battle.mp3"
+                loop
+                autoplay
+                controls
+              ></audio>
+            </div>
+            <button class="bgm-next"><img src="right.svg" /></button>
+          </div>
+        </article>
+        <article class="tab-content2">
+          <div class="job-skin-selection">
+            <button class="job-skin-before"><img src="left.svg" /></button>
+            <img src="bow_angel.png" alt="직업 아이콘" class="job-icon" />
+            <button class="job-skin-next"><img src="right.svg" /></button>
+          </div>
+          <div class="job-selection">
+            <button class="job-before"><img src="left.svg" /></button>
+            <p class="job">bow</p>
+            <button class="job-next"><img src="right.svg" /></button>
+          </div>
+        </article>
+        <article class="tab-content3">
+          <div class="castle-selection">
+            <button class="castle-before"><img src="left.svg" /></button>
+            <img src="castle1" alt="성" class="castle-icon" />
+            <button class="castle-next"><img src="right.svg" /></button>
+          </div>
+        </article>
+        <button class="menu-btn setting-btn">SAVE AND GO BACK TO MENU</button>
+      </div>
+    </div>
+
+    <div class="story"></div>
+    <div id="setting"></div>
+    <div id="game"></div>
+  </body>
 </html>

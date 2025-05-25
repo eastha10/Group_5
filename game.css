@@ -1,0 +1,193 @@
+body {
+  font-family: "Press Start 2P", cursive;
+}
+
+.start-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.start-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.start-logo {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 24px;
+  margin-bottom: 40px;
+  text-shadow: 2px 2px #000;
+}
+
+.menu {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.menu-btn {
+  font-family: "Press Start 2P", cursive;
+  background-color: #241917c4;
+  color: #fff3cd;
+  border: 4px solid #73562e;
+  border-radius: 10px;
+  box-shadow: 4px 4px #00000073;
+  text-shadow: 1px 1px #000000;
+  padding: 15px 30px;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgb(255 255 255 / 0.6);
+  z-index: 1;
+}
+
+.setting-container {
+  width: 65%;
+  height: 65%;
+  position: absolute;
+  top: 50%;
+  left: 60%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  text-align: center;
+  font-family: "Press Start 2P", cursive;
+  color: #333;
+  background-color: transparent;
+}
+#tab1,
+#tab2,
+#tab3 {
+  display: none;
+}
+.tabs {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 350px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  z-index: 2;
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(60, 45, 30, 0.2);
+  color: #333630;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+#tab1:checked ~ .tabs label[for="tab1"],
+#tab2:checked ~ .tabs label[for="tab2"],
+#tab3:checked ~ .tabs label[for="tab3"] {
+  background-color: transparent;
+  color: #000;
+  font-weight: bold;
+}
+.tab-content1,
+.tab-content2,
+.tab-content3 {
+  display: none;
+}
+#tab1:checked ~ .setting-container .tab-content1,
+#tab2:checked ~ .setting-container .tab-content2,
+#tab3:checked ~ .setting-container .tab-content3 {
+  display: block;
+}
+.job-selection,
+.job-skin-selection,
+.bgm-selection,
+.castle-selection {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 90px;
+  margin-bottom: 45px;
+}
+.job-icon {
+  width: 230px;
+  height: 200px;
+  margin-left: 20px;
+}
+.job {
+  width: 230px;
+  font-size: 45px;
+  margin-top: 20px;
+  margin-left: 20px;
+}
+.job-before,
+.job-next,
+.job-skin-before,
+.job-skin-next,
+.bgm-before,
+.bgm-next,
+.castle-before,
+.castle-next {
+  width: 40px;
+  height: 40px;
+  font-size: 30px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 55px;
+}
+.tab-content1 {
+  position: absolute;
+  left: 15%;
+  top: 25%;
+}
+.tab-content2 {
+  position: absolute;
+  left: 26%;
+  top: 10%;
+}
+.tab-content3 {
+  position: absolute;
+  left: 15%;
+  left: 33%;
+  top: 25%;
+}
+.bgm-conainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+.bgm-name {
+  line-height: 35px;
+  width: 500px;
+  font-size: 30px;
+  color: #333630;
+}
+.setting-btn {
+  position: fixed;
+  bottom: -10%;
+  right: -10px;
+  width: 245px;
+  cursor: pointer;
+}
