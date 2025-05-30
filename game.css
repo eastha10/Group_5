@@ -9,6 +9,10 @@ body {
   overflow: hidden;
 }
 
+#logo {
+  width: 57%;
+}
+
 .start-bg {
   width: 100%;
   height: 100%;
@@ -19,6 +23,9 @@ body {
   top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   color: #fff;
   font-size: 24px;
   margin-bottom: 40px;
@@ -132,13 +139,13 @@ body {
 .job-icon {
   width: 230px;
   height: 200px;
-  margin-left: 20px;
+  margin-left: 55px;
 }
 .job {
   width: 230px;
   font-size: 45px;
   margin-top: 20px;
-  margin-left: 20px;
+  margin-left: 55px;
 }
 .job-before,
 .job-next,
@@ -177,6 +184,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 30px;
+  margin-left: 55px;
 }
 .bgm-name {
   line-height: 35px;
@@ -189,5 +197,36 @@ body {
   bottom: -10%;
   right: -10px;
   width: 245px;
+  cursor: pointer;
+}
+#story {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  display: none;
+  z-index: 10;
+}
+
+#fade-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: black;
+  opacity: 0;
+  z-index: 999;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+#skip {
+  font-family: "Press Start 2P", cursive;
+  background-color: transparent;
+  color: white;
+  margin-top: 30px;
+  margin-left: 40px;
+  border: none;
+  font-size: 22px;
   cursor: pointer;
 }

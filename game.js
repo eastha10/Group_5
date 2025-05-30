@@ -8,12 +8,19 @@ const bgmTracks = [
   "fearless-final-boss-battle",
   "epic-battle",
 ];
+//직업 저장
 let job = 0;
+//스킨 저장
 let skin = 0;
+//배경음악 저장
 let music = 0;
+//성 스킨 저장
 let castle = 0;
+let story = 0;
+let storyInterval;
 
 $(document).ready(function () {
+  // options 버튼 클릭시
   $(".menu-btn")
     .eq(1)
     .on("click", function () {
@@ -64,6 +71,61 @@ $(document).ready(function () {
   $(".castle-next").on("click", function () {
     castle = (castle + 1) % castleicon.length;
     CastleChange();
+  });
+
+  // gamestart 버튼 클릭 시
+  $(".menu-btn")
+    .eq(0)
+    .on("click", function () {
+      $("#start-wrapper").hide();
+      $("#setting-wrapper").hide();
+      $("#level").hide();
+      $("#game").hide();
+      $("#story").show();
+
+      const storyImages = [
+        "story1.svg",
+        "story2.svg",
+        "story3.svg",
+        "story4.svg",
+        "story5.svg",
+        "story6.svg",
+        "story7.svg",
+        "story8.svg",
+        "story9.svg",
+      ];
+
+      $("#story").css("background-image", `url(${storyImages[story]})`);
+      $("#story").fadeIn(1000);
+      story++;
+
+      storyInterval = setInterval(() => {
+        $("#fade-overlay").css("opacity", 1);
+
+        setTimeout(() => {
+          if (story < storyImages.length) {
+            $("#story").css("background-image", `url(${storyImages[story]})`);
+            story++;
+            $("#fade-overlay").css("opacity", 0);
+          } else {
+            clearInterval(storyInterval);
+            $("#fade-overlay").css("opacity", 1);
+            setTimeout(() => {
+              $("#story").hide();
+              $("#fade-overlay").css("opacity", 0);
+              $("#level").show();
+            }, 1000);
+          }
+        }, 700);
+      }, 4000);
+    });
+
+  // Skip 버튼 눌렀을 때 스토리 스킵
+  $("#skip").on("click", function () {
+    clearInterval(storyInterval);
+    $("#story").hide();
+    $("#fade-overlay").css("opacity", 0);
+    $("#level").show();
   });
 });
 
