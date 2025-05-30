@@ -8,11 +8,11 @@ const bgmTracks = [
   "fearless-final-boss-battle",
   "epic-battle",
 ];
-//직업 저장
+//직업 저장 jobs 0: bow, 1: knight, 2: magic which
 let job = 0;
-//스킨 저장
+//스킨 저장은 위에 배열 bow, knight, magic_which 참고
 let skin = 0;
-//배경음악 저장
+//배경음악 저장 0: stealth-battle, 1: fearless-final-boss-battle, 2: epic-battle
 let music = 0;
 //성 스킨 저장
 let castle = 0;
