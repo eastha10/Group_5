@@ -26,7 +26,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #fff;
   font-size: 24px;
   margin-bottom: 40px;
   text-shadow: 2px 2px #000;
@@ -223,10 +222,36 @@ body {
 #skip {
   font-family: "Press Start 2P", cursive;
   background-color: transparent;
-  color: white;
+  color: #fff3cd;
   margin-top: 30px;
   margin-left: 40px;
   border: none;
   font-size: 22px;
   cursor: pointer;
+}
+#level {
+  width: 100vw;
+  height: 100vh;
+  background-image: url("level.svg");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  font-family: "Press Start 2P", cursive;
+  color: #fff3cd;
+  font-size: 24px;
+  text-shadow: 2px 2px #000;
+}
+
+.level-choice {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.4);
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.level-choice:hover {
+  background-color: rgba(0, 0, 0, 0);
 }
