@@ -1,223 +1,161 @@
-const canvas = $("#gameCanvas")[0];
-const ctx = canvas.getContext("2d");
+const jobs = ["bow", "knight", "magic which"];
+const bow = ["bow_angel", "bow_elf", "bow_soldier"];
+const knight = ["knight_dark", "knight_silver", "knight_white"];
+const magic_which = ["magic_witch", "magic_white", "magic_vampire"];
+const castleicon = ["castle1", "castle2", "castle3"];
+const bgmTracks = [
+  "stealth-battle",
+  "fearless-final-boss-battle",
+  "epic-battle",
+];
+//직업 저장 jobs 0: bow, 1: knight, 2: magic which
+let job = 0;
+//스킨 저장은 위에 배열 bow, knight, magic_which 참고
+let skin = 0;
+//배경음악 저장 0: stealth-battle, 1: fearless-final-boss-battle, 2: epic-battle
+let music = 0;
+//성 스킨 저장
+let castle = 0;
+let story = 0;
+let storyInterval;
 
-canvas.width = 1920;
-canvas.height = 969;
-
-const dirtLeft = 520;
-const dirtRight = 1400;
-const dirtTop = 0;
-const dirtBottom = canvas.height;
-
-const MONSTER_COLS = 6;
-const MONSTER_ROWS = 6;
-
-const monsterWidth = Math.floor((dirtRight - dirtLeft) / MONSTER_COLS);
-const monsterHeight = Math.floor((canvas.height) / MONSTER_ROWS);
-
-let x = canvas.width / 2;
-let y = canvas.height - 60;
-let dx = 5;
-let dy = -5;
-const radius = 10;
-
-let life = 3;
-let wave = 1;
-let monsters = [];
-let boss = null;
-let bossSpawned = false;
-
-const background = new Image();
-background.src = "gamebackground.png";
-
-const monsterImg = new Image();
-monsterImg.src = "slime_blue.png";
-
-const bossImg = new Image();
-bossImg.src = "slime_king.png";
-
-const paddle = {
-  width: 150,
-  height: 20,
-  x: canvas.width / 2 - 75,
-  y: canvas.height - 40,
-  draw: function () {
-    ctx.fillStyle = "white";
-    ctx.fillRect(this.x, this.y, this.width, this.height);
-  },
-  move: function (mouseX) {
-    this.x = mouseX - this.width / 2;
-    if (this.x < dirtLeft) this.x = dirtLeft;
-    if (this.x + this.width > dirtRight) this.x = dirtRight - this.width;
-  }
-};
-
-$(document).on("mousemove", function (e) {
-  const rect = canvas.getBoundingClientRect();
-  paddle.move(e.clientX - rect.left);
-});
-
-class Monster {
-  constructor(x, y, isBoss = false) {
-    this.x = x;
-    this.y = y;
-    this.width = isBoss ? monsterWidth * 2 : monsterWidth;
-    this.height = isBoss ? monsterHeight * 1.5 : monsterHeight;
-    this.hp = isBoss ? 4 : 1;
-    this.isBoss = isBoss;
-  }
-
-  draw() {
-    ctx.drawImage(this.isBoss ? bossImg : monsterImg, this.x, this.y, this.width, this.height);
-  }
-}
-
-function generateMonsterRow() {
-  const row = [];
-  const positions = [0, 1, 2, 3, 4, 5];
-  const empty = positions.sort(() => 0.5 - Math.random()).slice(0, 2);
-
-  for (let i = 0; i < 6; i++) {
-    if (!empty.includes(i)) {
-      const x = dirtLeft + i * monsterWidth;
-      const y = dirtTop;
-      row.push(new Monster(x, y));
-    }
-  }
-
-  monsters.forEach(m => m.y += monsterHeight);
-  return row;
-}
-
-function spawnBoss() {
-  const bossX = dirtLeft + monsterWidth * 2;
-  const bossY = dirtTop;
-
-  monsters.forEach(m => {
-    const mMidX = m.x + m.width / 2;
-    if (mMidX >= bossX && mMidX <= bossX + monsterWidth * 2) {
-      m.y += monsterHeight;
-    }
+$(document).ready(function () {
+  // options 버튼 클릭시
+  $(".menu-btn")
+    .eq(1)
+    .on("click", function () {
+      $(".menu").hide();
+      $(".start-logo").hide();
+      $("#setting-wrapper").removeClass("hidden");
+    });
+  $(".setting-btn").on("click", function () {
+    $(".menu").show();
+    $(".start-logo").show();
+    $("#setting-wrapper").addClass("hidden");
   });
 
-  boss = new Monster(bossX, bossY, true);
-  bossSpawned = true;
-}
+  $(".job-before").on("click", function () {
+    job = job - 1 + jobs.length;
+    job = job % jobs.length;
+    $(".job").text(jobs[job]);
+    JobChange();
+  });
+  $(".job-next").on("click", function () {
+    job = job + 1 + jobs.length;
+    job = job % jobs.length;
+    $(".job").text(jobs[job]);
+    JobChange();
+  });
+  $(".job-skin-before").on("click", function () {
+    skin = skin - 1 + 3;
+    skin = skin % 3;
+    SkinChange();
+  });
+  $(".job-skin-next").on("click", function () {
+    skin = skin + 1 + 3;
+    skin = skin % 3;
+    SkinChange();
+  });
+  $(".bgm-before").on("click", function () {
+    music = (music - 1 + bgmTracks.length) % bgmTracks.length;
+    MusicChange();
+  });
+  $(".bgm-next").on("click", function () {
+    music = (music + 1) % bgmTracks.length;
+    MusicChange();
+  });
+  $(".castle-before").on("click", function () {
+    castle = (castle - 1 + castleicon.length) % castleicon.length;
+    CastleChange();
+  });
+  $(".castle-next").on("click", function () {
+    castle = (castle + 1) % castleicon.length;
+    CastleChange();
+  });
 
-function isColliding(ballX, ballY, ballR, m) {
-  return (
-    ballX + ballR > m.x &&
-    ballX - ballR < m.x + m.width &&
-    ballY + ballR > m.y &&
-    ballY - ballR < m.y + m.height
-  );
-}
+  // gamestart 버튼 클릭 시
+  $(".menu-btn")
+    .eq(0)
+    .on("click", function () {
+      $("#start-wrapper").hide();
+      $("#setting-wrapper").hide();
+      $("#level").hide();
+      $("#game").hide();
+      $("#story").show();
 
-function handleBallMonsterCollision(ballX, ballY, ballR, m) {
-  const prevX = ballX - dx;
-  const prevY = ballY - dy;
+      const storyImages = [
+        "story1.svg",
+        "story2.svg",
+        "story3.svg",
+        "story4.svg",
+        "story5.svg",
+        "story6.svg",
+        "story7.svg",
+        "story8.svg",
+        "story9.svg",
+      ];
 
-  const wasAbove = prevY + ballR <= m.y;
-  const wasBelow = prevY - ballR >= m.y + m.height;
-  const wasLeft = prevX + ballR <= m.x;
-  const wasRight = prevX - ballR >= m.x + m.width;
+      $("#story").css("background-image", `url(${storyImages[story]})`);
+      $("#story").fadeIn(1000);
+      story++;
 
-  if (wasAbove || wasBelow) {
-    dy = -dy;
-  } else if (wasLeft || wasRight) {
-    dx = -dx;
-  } else {
-    dx = -dx;
-    dy = -dy;
+      storyInterval = setInterval(() => {
+        $("#fade-overlay").css("opacity", 1);
+
+        setTimeout(() => {
+          if (story < storyImages.length) {
+            $("#story").css("background-image", `url(${storyImages[story]})`);
+            story++;
+            $("#fade-overlay").css("opacity", 0);
+          } else {
+            clearInterval(storyInterval);
+            $("#fade-overlay").css("opacity", 1);
+            setTimeout(() => {
+              $("#story").hide();
+              $("#fade-overlay").css("opacity", 0);
+              $("#level").show();
+            }, 1000);
+          }
+        }, 700);
+      }, 4000);
+    });
+
+  // Skip 버튼 눌렀을 때 스토리 스킵
+  $("#skip").on("click", function () {
+    clearInterval(storyInterval);
+    $("#story").hide();
+    $("#fade-overlay").css("opacity", 0);
+    $("#level").show();
+  });
+});
+
+function JobChange() {
+  if (jobs[job] === "bow") {
+    $(".job-icon").attr("src", `${bow[0]}.png`);
+    skin = 0;
+  } else if (jobs[job] === "knight") {
+    $(".job-icon").attr("src", `${knight[0]}.png`);
+    skin = 0;
+  } else if (jobs[job] === "magic which") {
+    $(".job-icon").attr("src", `${magic_which[0]}.png`);
+    skin = 0;
   }
 }
 
-function nextWave() {
-  if (wave < 3) {
-    monsters.unshift(...generateMonsterRow());
-    wave++;
-    $("#wave").text(wave);
-  } else if (!boss && !bossSpawned) {
-    spawnBoss();
-    $("#wave").text("Boss");
+function SkinChange() {
+  if (jobs[job] === "bow") {
+    $(".job-icon").attr("src", `${bow[skin]}.png`);
+  } else if (jobs[job] === "knight") {
+    $(".job-icon").attr("src", `${knight[skin]}.png`);
+  } else if (jobs[job] === "magic which") {
+    $(".job-icon").attr("src", `${magic_which[skin]}.png`);
   }
 }
-setInterval(nextWave, 10000);
-
-function checkGameClear() {
-  if (bossSpawned && !boss && monsters.length === 0) {
-    alert("🎉 게임 클리어!");
-    window.location.reload();
-  }
+function MusicChange() {
+  const src = `${bgmTracks[music]}.mp3`;
+  $("#bgm").attr("src", src)[0].play();
+  $(".bgm-name").text(bgmTracks[music].replace(/-/g, " "));
 }
-
-function draw() {
-  ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-
-  ctx.beginPath();
-  ctx.arc(x, y, radius, 0, Math.PI * 2);
-  ctx.fillStyle = "white";
-  ctx.fill();
-  ctx.closePath();
-
-  for (let i = monsters.length - 1; i >= 0; i--) {
-    const m = monsters[i];
-    m.draw();
-    if (isColliding(x, y, radius, m)) {
-      handleBallMonsterCollision(x, y, radius, m);
-      m.hp--;
-      if (m.hp <= 0) monsters.splice(i, 1);
-    }
-  }
-
-  if (boss) {
-    boss.draw();
-    if (isColliding(x, y, radius, boss)) {
-      handleBallMonsterCollision(x, y, radius, boss);
-      boss.hp--;
-      if (boss.hp <= 0) boss = null;
-    }
-  }
-
-  paddle.draw();
-
-  if (
-    y + radius > paddle.y &&
-    y + radius < paddle.y + paddle.height &&
-    x > paddle.x &&
-    x < paddle.x + paddle.width
-  ) {
-    dy = -Math.abs(dy);
-  }
-
-  if (x - radius <= dirtLeft || x + radius >= dirtRight) dx = -dx;
-  if (y - radius <= 0) dy = -dy;
-
-  if (y + radius > canvas.height) {
-    life--;
-    $("#life").text(life);
-    resetBall();
-    if (life <= 0) {
-      alert("게임 오버!");
-      document.location.reload();
-    }
-  }
-
-  x += dx;
-  y += dy;
-
-  checkGameClear();
-  requestAnimationFrame(draw);
+function CastleChange() {
+  $(".castle-icon").attr("src", `${castleicon[castle]}.png`);
 }
-
-function resetBall() {
-  x = canvas.width / 2;
-  y = canvas.height - 60;
-  dx = 5;
-  dy = -5;
-}
-
-background.onload = () => {
-  monsters.push(...generateMonsterRow());
-  draw();
-};
