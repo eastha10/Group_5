@@ -56,7 +56,6 @@ body {
   background-color: rgba(0, 0, 0, 0);
 }
 
-
 /* ===========================
    B) 팀원 코드 CSS (나중에 작성 → 우선 순위)
    =========================== */
@@ -241,7 +240,6 @@ body {
 .tab-content3 {
   position: absolute;
   left: 15%;
-  left: 33%;
   top: 25%;
 }
 .bgm-conainer {
@@ -294,4 +292,8 @@ body {
   border: none;
   font-size: 22px;
   cursor: pointer;
+}
+.castle-icon {
+  margin-left: 70px;
+  width: 500px;
 }
