@@ -4,21 +4,16 @@ let difficulty = "easy";
 let canvas;
 let ctx;
 
-// 흙길 영역
 const dirtLeft = 520;
 const dirtRight = 1400;
 const dirtTop = 0;
-const dirtBottom = () => canvas.height;
 
-// 몬스터 그리드 설정
 const MONSTER_COLS = 6;
 const MONSTER_ROWS = 6;
 let monsterWidth, monsterHeight;
 
-// 공 속성
 let x, y, dx, dy, radius;
 
-// 상태 변수
 let life = 3;
 let wave = 1;
 let monsters = [];
@@ -26,62 +21,27 @@ let boss = null;
 let bossSpawned = false;
 let waveIntervalId = null;
 
-// 이미지 로드
+let charSprite = new Image();
+let castleSprite = new Image();
+
 const background = new Image();
 const monsterImages = [];
 const bossImg = new Image();
 
-// 패들 객체
-const paddle = {
-  width: 150,
-  height: 20,
-  x: 0,
-  y: 0,
-  draw() {
-    ctx.fillStyle = "white";
-    ctx.fillRect(this.x, this.y, this.width, this.height);
-  },
-  move(mouseX) {
-    this.x = mouseX - this.width / 2;
-    if (this.x < dirtLeft) this.x = dirtLeft;
-    if (this.x + this.width > dirtRight) this.x = dirtRight - this.width;
+function handleGameOver() {
+  const pages = ["ending_fail1.html", "ending_fail2.html"];
+  const randomIndex = Math.floor(Math.random() * pages.length);
+  window.location.href = pages[randomIndex];
+}
+
+function decrementLife() {
+  life--;
+  $("#life").text(life);
+  if (life <= 0) {
+    handleGameOver();
   }
-};
+}
 
-// 마우스 이동 → 패들 이동
-$(document).ready(function () {
-  canvas = $("#gameCanvas")[0];
-  ctx = canvas.getContext("2d");
-  canvas.width = 1920;
-  canvas.height = 969;
-  x = canvas.width / 2;
-  y = canvas.height - 60;
-  dx = 5;
-  dy = -5;
-  radius = 10;
-  monsterWidth = Math.floor((dirtRight - dirtLeft) / MONSTER_COLS);
-  monsterHeight = Math.floor(canvas.height / MONSTER_ROWS);
-  paddle.x = canvas.width / 2 - paddle.width / 2;
-  paddle.y = canvas.height - 40;
-
-  $(document).on("mousemove", function (e) {
-    const rect = canvas.getBoundingClientRect();
-    paddle.move(e.clientX - rect.left);
-  });
-
-  // 난이도 선택
-  $(".level-choice").on("click", function () {
-    console.log("레벨 클릭됨 -> 난이도:", $(this).attr("id"));
-    difficulty = $(this).attr("id");
-    $("#level").hide();
-    $("#gameCanvas").show();
-    $("#ui").show();
-
-    startGame();
-  });
-});
-
-// 몬스터 클래스
 class Monster {
   constructor(x, y, isBoss = false) {
     this.x = x;
@@ -105,33 +65,34 @@ class Monster {
   }
 }
 
-// 몬스터 한 줄 생성
 function generateMonsterRow() {
   const row = [];
   const positions = [0, 1, 2, 3, 4, 5];
   const empty = positions.sort(() => 0.5 - Math.random()).slice(0, 2);
 
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < MONSTER_COLS; i++) {
     if (!empty.includes(i)) {
-      const x = dirtLeft + i * monsterWidth;
-      const y = dirtTop;
-      row.push(new Monster(x, y));
+      const xPos = dirtLeft + i * monsterWidth;
+      const yPos = dirtTop;
+      row.push(new Monster(xPos, yPos));
     }
   }
-
-  monsters.forEach(m => m.y += monsterHeight);
   return row;
 }
 
-// 보스 소환
 function spawnBoss() {
   const bossX = dirtLeft + monsterWidth * 2;
   const bossY = dirtTop;
+  const bossLeft = bossX;
+  const bossRight = bossX + monsterWidth * 2;
 
   monsters.forEach(m => {
-    const mMidX = m.x + m.width / 2;
-    if (mMidX >= bossX && mMidX <= bossX + monsterWidth * 2) {
-      m.y += monsterHeight;
+    const mRight = m.x + m.width;
+    const mBottom = m.y + m.height;
+    const isHorizontallyOverlapping = !(m.x >= bossRight || mRight <= bossLeft);
+    const isVerticallyOverlapping = !(m.y >= bossY + monsterHeight * 2 || mBottom <= bossY);
+    if (isHorizontallyOverlapping && isVerticallyOverlapping) {
+      m.y += monsterHeight * 2;
     }
   });
 
@@ -139,7 +100,6 @@ function spawnBoss() {
   bossSpawned = true;
 }
 
-// 충돌 체크
 function isColliding(ballX, ballY, ballR, m) {
   return (
     ballX + ballR > m.x &&
@@ -149,7 +109,6 @@ function isColliding(ballX, ballY, ballR, m) {
   );
 }
 
-// 충돌 처리
 function handleBallMonsterCollision(ballX, ballY, ballR, m) {
   const prevX = ballX - dx;
   const prevY = ballY - dy;
@@ -169,9 +128,9 @@ function handleBallMonsterCollision(ballX, ballY, ballR, m) {
   }
 }
 
-// 다음 웨이브 진행
 function nextWave() {
-  // ✅ 난이도별 최대 웨이브 수
+  shiftAllDown();
+
   let maxWave = 3;
   if (difficulty === "normal") maxWave = 4;
   else if (difficulty === "hard") maxWave = 5;
@@ -186,7 +145,6 @@ function nextWave() {
   }
 }
 
-// 게임 클리어 체크
 function checkGameClear() {
   if (bossSpawned && !boss && monsters.length === 0) {
     clearInterval(waveIntervalId);
@@ -203,15 +161,13 @@ function checkGameClear() {
   }
 }
 
-// 공 위치 초기화
 function resetBall() {
-  x = canvas.width / 2;
-  y = canvas.height - 60;
+  x = paddle.x + paddle.width / 2;
+  y = paddle.y - 30;
   dx = 5;
   dy = -5;
 }
 
-// 게임 시작
 function startGame() {
   background.src = `${difficulty}.png`;
 
@@ -224,15 +180,23 @@ function startGame() {
 
   bossImg.src = `${difficulty}boss.png`;
 
-  // ✅ 난이도별 생명 설정
   if (difficulty === "easy") life = 3;
   else if (difficulty === "normal") life = 2;
-  else life = 1;
+  else life = 100;
 
   $("#life").text(life);
   $("#wave").text(wave);
 
+  let charName = "";
+  if (jobs[job] === "bow") charName = bow[skin];
+  else if (jobs[job] === "knight") charName = knight[skin];
+  else if (jobs[job] === "magic") charName = magic_which[skin];
+
+  charSprite.src = `${charName}.png`;
+  castleSprite.src = `${castleicon[castle]}.png`;
+
   $("#ui").show();
+  resetBall();
 
   background.onload = () => {
     monsters.push(...generateMonsterRow());
@@ -247,7 +211,6 @@ function startGame() {
   };
 }
 
-// 난이도 변경 시 새 게임 시작
 function startNewGame(difficultyName) {
   difficulty = difficultyName;
   monsters = [];
@@ -266,10 +229,9 @@ function startNewGame(difficultyName) {
   startGame();
 }
 
-// 메인 루프
-let gameOver = false;
 function draw() {
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+  ctx.drawImage(castleSprite, 0, canvas.height - 250, canvas.width, 300);
 
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2);
@@ -277,13 +239,25 @@ function draw() {
   ctx.fill();
   ctx.closePath();
 
+  const toRemove = [];
   for (let i = monsters.length - 1; i >= 0; i--) {
     const m = monsters[i];
     m.draw();
     if (isColliding(x, y, radius, m)) {
       handleBallMonsterCollision(x, y, radius, m);
       m.hp--;
-      if (m.hp <= 0) monsters.splice(i, 1);
+      if (m.hp <= 0) toRemove.push(i);
+      break;
+    }
+  }
+  toRemove.forEach(i => monsters.splice(i, 1));
+
+  for (let i = monsters.length - 1; i >= 0; i--) {
+    const m = monsters[i];
+    if (m.y >= monsterHeight * (MONSTER_ROWS - 1)) {
+      monsters.splice(i, 1);
+      decrementLife();
+      if (life <= 0) return;
     }
   }
 
@@ -292,7 +266,18 @@ function draw() {
     if (isColliding(x, y, radius, boss)) {
       handleBallMonsterCollision(x, y, radius, boss);
       boss.hp--;
-      if (boss.hp <= 0) boss = null;
+      if (boss.hp <= 0) {
+        boss = null;
+      }
+    }
+    if (
+      boss &&
+      boss.y > monsterHeight * 2 &&
+      boss.y + boss.height >= monsterHeight * MONSTER_ROWS
+    ) {
+      boss = null;
+      decrementLife();
+      if (life <= 0) return;
     }
   }
 
@@ -307,7 +292,6 @@ function draw() {
     const hitPoint = (x - (paddle.x + paddle.width / 2)) / (paddle.width / 2);
     const angle = hitPoint * (Math.PI / 3);
     const speed = Math.sqrt(dx * dx + dy * dy);
-
     dx = speed * Math.sin(angle);
     dy = -Math.abs(speed * Math.cos(angle));
   }
@@ -315,20 +299,9 @@ function draw() {
   if (x - radius <= dirtLeft || x + radius >= dirtRight) dx = -dx;
   if (y - radius <= 0) dy = -dy;
 
-  if (y + radius > canvas.height) {
-    life--;
-    $("#life").text(life);
-
-
-    if (life <= 0) 
-    {
-      gameOver = true;
-      const pages = ["ending_fail1.html", "ending_fail2.html"];
-      const randomIndex = Math.floor(Math.random() * 2);
-      window.location.href = pages[randomIndex];
-      return;
-    }
-
+  if (y + radius > paddle.y + paddle.height + 5) {
+    decrementLife();
+    if (life <= 0) return;
     resetBall();
   }
 
@@ -338,3 +311,65 @@ function draw() {
   checkGameClear();
   requestAnimationFrame(draw);
 }
+
+function shiftAllDown() {
+  monsters.forEach(m => {
+    m.y += monsterHeight;
+  });
+  if (boss) {
+    boss.y += monsterHeight;
+  }
+}
+
+const paddle = {
+  width: 150,
+  height: 20,
+  x: 0,
+  y: 0,
+  draw() {
+    ctx.fillStyle = "white";
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx.drawImage(charSprite, this.x + this.width / 2 - 50, this.y + 5, 100, 100);
+  },
+  move(mouseX) {
+    this.x = mouseX - this.width / 2;
+    if (this.x < dirtLeft) this.x = dirtLeft;
+    if (this.x + this.width > dirtRight) this.x = dirtRight - this.width;
+    const char = document.getElementById("selected-character");
+    if (char) {
+      char.style.left = `${this.x + this.width / 2 - 50}px`;
+      char.style.top = `${this.y + 5}px`;
+    }
+  }
+};
+
+$(document).ready(function () {
+  canvas = $("#gameCanvas")[0];
+  ctx = canvas.getContext("2d");
+  canvas.width = 1920;
+  canvas.height = 969;
+
+  x = canvas.width / 2;
+  dx = 5;
+  dy = -5;
+  radius = 10;
+
+  monsterWidth = Math.floor((dirtRight - dirtLeft) / MONSTER_COLS);
+  monsterHeight = Math.floor(canvas.height / MONSTER_ROWS);
+
+  paddle.x = canvas.width / 2 - paddle.width / 2;
+  paddle.y = canvas.height - 100;
+
+  $(document).on("mousemove", function (e) {
+    const rect = canvas.getBoundingClientRect();
+    paddle.move(e.clientX - rect.left);
+  });
+
+  $(".level-choice").on("click", function () {
+    difficulty = $(this).attr("id");
+    $("#level").hide();
+    $("#gameCanvas").show();
+    $("#ui").show();
+    startGame();
+  });
+});
