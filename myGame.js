@@ -28,6 +28,16 @@ const background = new Image();
 const monsterImages = [];
 const bossImg = new Image();
 
+let skillReady = false;
+let monsterKillCount = 0;
+
+let skillEffect = null; // 현재 이펙트 이미지
+let skillEffectX = 0;
+let skillEffectY = 0;
+let skillEffectW = 0;
+let skillEffectH = 0;
+let skillEffectEndTime = 0;
+
 function handleGameOver() {
   const pages = ["ending_fail1.html", "ending_fail2.html"];
   const randomIndex = Math.floor(Math.random() * pages.length);
@@ -164,8 +174,8 @@ function checkGameClear() {
 function resetBall() {
   x = paddle.x + paddle.width / 2;
   y = paddle.y - 30;
-  dx = 5;
-  dy = -5;
+  dx = 3;
+  dy = -3;
 }
 
 function startGame() {
@@ -190,7 +200,7 @@ function startGame() {
   let charName = "";
   if (jobs[job] === "bow") charName = bow[skin];
   else if (jobs[job] === "knight") charName = knight[skin];
-  else if (jobs[job] === "magic") charName = magic_which[skin];
+  else if (jobs[job] === "magic witch") charName = magic_witch[skin];
 
   charSprite.src = `${charName}.png`;
   castleSprite.src = `${castleicon[castle]}.png`;
@@ -223,6 +233,11 @@ function startNewGame(difficultyName) {
   x = canvas.width / 2;
   y = canvas.height - 60;
 
+  skillReady = false;
+  monsterKillCount = 0;
+  $("#skill-status").text("대기중").css("color", "gray");
+
+
   $("#life").text(life);
   $("#wave").text(wave);
 
@@ -250,7 +265,18 @@ function draw() {
       break;
     }
   }
-  toRemove.forEach(i => monsters.splice(i, 1));
+  toRemove.forEach(i => {
+    const killed = monsters[i];
+    if (!killed.isBoss) {
+      monsterKillCount++;
+      if (monsterKillCount >= 8) {
+        skillReady = true;
+        monsterKillCount = 0;
+        $("#skill-status").text("🌀 준비됨").css("color", "aqua");
+      }
+    }
+    monsters.splice(i, 1);
+  });
 
   for (let i = monsters.length - 1; i >= 0; i--) {
     const m = monsters[i];
@@ -308,6 +334,12 @@ function draw() {
   x += dx;
   y += dy;
 
+
+  if (skillEffect && Date.now() < skillEffectEndTime) {
+    ctx.drawImage(skillEffect, skillEffectX, skillEffectY, skillEffectW, skillEffectH);
+  } else {
+    skillEffect = null;
+  }
   checkGameClear();
   requestAnimationFrame(draw);
 }
@@ -372,4 +404,82 @@ $(document).ready(function () {
     $("#ui").show();
     startGame();
   });
+  $(document).on("mousedown", function (e) {
+    if (e.button === 0) {
+      console.log("좌클릭 감지됨");
+      if (skillReady) {
+        console.log("스킬 발동!");
+        useSkill();
+      }
+    }
+  });
 });
+
+function useSkill() {
+  if (jobs[job] === "knight") useKnightSkill();
+  else if (jobs[job] === "bow") useBowSkill();
+  else if (jobs[job] === "magic witch") useMagicSkill();
+
+  skillReady = false;
+  $("#skill-status").text("대기중").css("color", "gray");
+}
+
+function useKnightSkill() {
+  monsters.forEach((m) => {
+    if (Math.abs(m.y - y) < monsterHeight) m.hp -= 3;
+  });
+  if (boss && Math.abs(boss.y - y) < boss.height) boss.hp -= 3;
+  cleanupMonsters();
+
+  skillEffect = new Image();
+  skillEffect.src = "garen.png";
+  skillEffectX = dirtLeft;
+  skillEffectY = Math.floor(y / monsterHeight) * monsterHeight;
+  skillEffectW = dirtRight - dirtLeft;
+  skillEffectH = monsterHeight;
+  skillEffectEndTime = Date.now() + 400;
+}
+
+function useBowSkill() {
+  monsters.forEach((m) => {
+    if (Math.abs(m.x - x) < monsterWidth) m.hp -= 3;
+  });
+  if (boss && Math.abs(boss.x - x) < boss.width) boss.hp -= 3;
+  cleanupMonsters();
+
+  skillEffect = new Image();
+  skillEffect.src = "ash.png";
+
+  const col = Math.floor((x - dirtLeft) / monsterWidth);
+  skillEffectX = dirtLeft + col * monsterWidth;
+  skillEffectY = 0;
+  skillEffectW = monsterWidth;
+  skillEffectH = canvas.height;
+  skillEffectEndTime = Date.now() + 400;
+}
+
+
+function useMagicSkill() {
+  monsters.forEach((m) => m.hp -= 1);
+  if (boss) boss.hp -= 1;
+  cleanupMonsters();
+
+  skillEffect = new Image();
+  skillEffect.src = "lux.png";
+  skillEffectX = dirtLeft;
+  skillEffectY = dirtTop;
+  skillEffectW = dirtRight - dirtLeft;
+  skillEffectH = paddle.y; // 패들 윗부분까지만 출력
+  skillEffectEndTime = Date.now() + 400;
+}
+function cleanupMonsters() {
+  for (let i = monsters.length - 1; i >= 0; i--) {
+    if (monsters[i].hp <= 0) {
+      monsters.splice(i, 1);
+    }
+  }
+
+  if (boss && boss.hp <= 0) {
+    boss = null;
+  }
+}

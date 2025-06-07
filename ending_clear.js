@@ -123,7 +123,7 @@ function nextSlide() {
     typeSlide();
   } else {
     setTimeout(() => {
-        location.reload();
+        window.location.href = "game.html";
     }, 3000)
   }
 }

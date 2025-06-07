@@ -1,16 +1,16 @@
-const jobs = ["bow", "knight", "magic which"];
+const jobs = ["bow", "knight", "magic witch"];
 const bow = ["bow_angel", "bow_elf", "bow_soldier"];
 const knight = ["knight_dark", "knight_silver", "knight_white"];
-const magic_which = ["magic_witch", "magic_white", "magic_vampire"];
+const magic_witch = ["magic_witch", "magic_white", "magic_vampire"];
 const castleicon = ["castle1", "castle2", "castle3"];
 const bgmTracks = [
   "stealth-battle",
   "fearless-final-boss-battle",
   "epic-battle",
 ];
-//직업 저장 jobs 0: bow, 1: knight, 2: magic which
+//직업 저장 jobs 0: bow, 1: knight, 2: magic witch
 let job = 0;
-//스킨 저장은 위에 배열 bow, knight, magic_which 참고
+//스킨 저장은 위에 배열 bow, knight, magic_witch 참고
 let skin = 0;
 //배경음악 저장 0: stealth-battle, 1: fearless-final-boss-battle, 2: epic-battle
 let music = 0;
@@ -136,8 +136,8 @@ function JobChange() {
   } else if (jobs[job] === "knight") {
     $(".job-icon").attr("src", `${knight[0]}.png`);
     skin = 0;
-  } else if (jobs[job] === "magic which") {
-    $(".job-icon").attr("src", `${magic_which[0]}.png`);
+  } else if (jobs[job] === "magic witch") {
+    $(".job-icon").attr("src", `${magic_witch[0]}.png`);
     skin = 0;
   }
 }
@@ -147,8 +147,8 @@ function SkinChange() {
     $(".job-icon").attr("src", `${bow[skin]}.png`);
   } else if (jobs[job] === "knight") {
     $(".job-icon").attr("src", `${knight[skin]}.png`);
-  } else if (jobs[job] === "magic which") {
-    $(".job-icon").attr("src", `${magic_which[skin]}.png`);
+  } else if (jobs[job] === "magic witch") {
+    $(".job-icon").attr("src", `${magic_witch[skin]}.png`);
   }
 }
 function MusicChange() {
