@@ -1,5 +1,7 @@
 let drawStarted = false;
 let difficulty = "easy";
+let startTime = null;
+let elapsedTime = 0;
 
 let canvas;
 let ctx;
@@ -31,39 +33,12 @@ const bossImg = new Image();
 let skillReady = false;
 let monsterKillCount = 0;
 
-let skillEffect = null;
+let skillEffect = null; // 현재 이펙트 이미지
 let skillEffectX = 0;
 let skillEffectY = 0;
 let skillEffectW = 0;
 let skillEffectH = 0;
 let skillEffectEndTime = 0;
-
-// 1. 위치 중복 검사
-function isPositionOccupied(xPos, yPos) {
-  if (boss && boss.x === xPos && boss.y === yPos) return true;
-  return monsters.some(m => m.x === xPos && m.y === yPos);
-}
-
-// 2. 두 사각형 겹침 검사
-function isOverlappingArea(x1, y1, w1, h1, x2, y2, w2, h2) {
-  return !(x1 + w1 <= x2 || x2 + w2 <= x1 ||
-           y1 + h1 <= y2 || y2 + h2 <= y1);
-}
-
-// 3. 몬스터 재귀적 밀기
-function pushMonsterDown(monster) {
-  monster.y += monsterHeight * 2;
-  monsters.forEach(other => {
-    if (other !== monster &&
-        isOverlappingArea(
-          monster.x, monster.y, monster.width, monster.height,
-          other.x, other.y, other.width, other.height
-        )
-    ) {
-      pushMonsterDown(other);
-    }
-  });
-}
 
 function handleGameOver() {
   const pages = ["ending_fail1.html", "ending_fail2.html"];
@@ -104,19 +79,39 @@ class Monster {
 
 function generateMonsterRow() {
   const row = [];
-  const positions = [0,1,2,3,4,5];
+  const positions = [0, 1, 2, 3, 4, 5];
   const empty = positions.sort(() => 0.5 - Math.random()).slice(0, 2);
 
   for (let i = 0; i < MONSTER_COLS; i++) {
     if (!empty.includes(i)) {
       const xPos = dirtLeft + i * monsterWidth;
       const yPos = dirtTop;
-      if (!isPositionOccupied(xPos, yPos)) {
-        row.push(new Monster(xPos, yPos));
-      }
+      row.push(new Monster(xPos, yPos));
     }
   }
   return row;
+}
+
+function isPositionOccupied(xPos, yPos) {
+  if (boss && boss.x === xPos && boss.y === yPos) return true;
+  return monsters.some(m => m.x === xPos && m.y === yPos);
+}
+function isOverlappingArea(x1, y1, w1, h1, x2, y2, w2, h2) {
+  return !(x1 + w1 <= x2 || x2 + w2 <= x1 || y1 + h1 <= y2 || y2 + h2 <= y1);
+}
+function pushMonsterDown(monster) {
+  monster.y += monsterHeight * 2;
+  monsters.forEach(other => {
+    if (
+      other !== monster &&
+      isOverlappingArea(
+        monster.x, monster.y, monster.width, monster.height,
+        other.x, other.y, other.width, other.height
+      )
+    ) {
+      pushMonsterDown(other);
+    }
+  });
 }
 
 function spawnBoss() {
@@ -125,17 +120,15 @@ function spawnBoss() {
   const bossW = monsterWidth * 2;
   const bossH = monsterHeight * 2;
 
-  // 보스 영역과 겹치는 몬스터만 재귀적으로 아래로 밀기
   monsters.forEach(m => {
     if (isOverlappingArea(m.x, m.y, m.width, m.height, bossX, bossY, bossW, bossH)) {
       pushMonsterDown(m);
     }
   });
 
-  // 그래도 보스 위치가 차 있으면 가상의 객체로 한 번 더 밀기
   if (isPositionOccupied(bossX, bossY)) {
-    const temp = { x: bossX, y: bossY, width: bossW, height: bossH };
-    pushMonsterDown(temp);
+    const fake = { x: bossX, y: bossY, width: bossW, height: bossH };
+    pushMonsterDown(fake);
   }
 
   boss = new Monster(bossX, bossY, true);
@@ -190,18 +183,36 @@ function nextWave() {
 function checkGameClear() {
   if (bossSpawned && !boss && monsters.length === 0) {
     clearInterval(waveIntervalId);
-    if (difficulty === "easy") {
-      alert("✅ Easy 클리어! Normal 모드를 시작합니다.");
-      startNewGame("normal");
-    } else if (difficulty === "normal") {
-      alert("✅ Normal 클리어! Hard 모드를 시작합니다.");
-      startNewGame("hard");
-    } else {
-      alert("🎉 Hard 모드까지 클리어했습니다! 수고하셨습니다!");
-      window.location.href = "ending_clear.html";
-    }
+
+    dx = 0;
+    dy = 0;
+    startTime = null;
+
+    const timeTaken = elapsedTime;
+    const lostLife = (difficulty === "easy" ? 3 : difficulty === "normal" ? 2 : 100) - life;
+    let score = 10000 - (timeTaken * 25) - lostLife * 1000;
+    if (score < 0) score = 0;
+
+    let message = "";
+    if (difficulty === "easy") message = "✅ Easy 클리어! Normal 모드를 시작합니다.";
+    else if (difficulty === "normal") message = "✅ Normal 클리어! Hard 모드를 시작합니다.";
+    else message = "🎉 Hard 모드까지 클리어했습니다! 수고하셨습니다!";
+
+    $("#clear-message").text(message);
+    $("#clear-score").html(`⏱ 시간: ${timeTaken}초<br❤️ 잃은 생명: ${lostLife}<br>🏆 점수: ${score}`);
+    $("#clear-popup").show();
+
+    // 버튼 클릭 처리
+    $("#next-button").off("click").on("click", function () {
+      $("#clear-popup").hide();
+
+      if (difficulty === "easy") startNewGame("normal");
+      else if (difficulty === "normal") startNewGame("hard");
+      else window.location.href = "ending_clear.html";
+    });
   }
 }
+
 
 function resetBall() {
   x = paddle.x + paddle.width / 2;
@@ -241,6 +252,7 @@ function startGame() {
   resetBall();
 
   background.onload = () => {
+    startTime = Date.now();
     monsters.push(...generateMonsterRow());
 
     if (!drawStarted) {
@@ -304,7 +316,7 @@ function draw() {
       if (monsterKillCount >= 8) {
         skillReady = true;
         monsterKillCount = 0;
-        $("#skill-status").text("🌀 준비됨").css("color", "aqua");
+        $("#skill-status").text("준비됨").css("color", "aqua");
       }
     }
     monsters.splice(i, 1);
@@ -365,6 +377,10 @@ function draw() {
 
   x += dx;
   y += dy;
+  if (startTime !== null) {
+  elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+  $("#time").text(elapsedTime + "초");
+}
 
 
   if (skillEffect && Date.now() < skillEffectEndTime) {
@@ -457,6 +473,7 @@ function useSkill() {
 }
 
 function useKnightSkill() {
+  playSkillSound("garen");
   monsters.forEach((m) => {
     if (Math.abs(m.y - y) < monsterHeight) m.hp -= 3;
   });
@@ -473,6 +490,7 @@ function useKnightSkill() {
 }
 
 function useBowSkill() {
+  playSkillSound("ash");
   monsters.forEach((m) => {
     if (Math.abs(m.x - x) < monsterWidth) m.hp -= 3;
   });
@@ -492,6 +510,7 @@ function useBowSkill() {
 
 
 function useMagicSkill() {
+  playSkillSound("lux");
   monsters.forEach((m) => m.hp -= 1);
   if (boss) boss.hp -= 1;
   cleanupMonsters();
@@ -514,4 +533,9 @@ function cleanupMonsters() {
   if (boss && boss.hp <= 0) {
     boss = null;
   }
+}
+function playSkillSound(name) {
+  const sound = new Audio(`${name}.mp3`);
+  sound.volume = 1.0;
+  sound.play();
 }
