@@ -74,58 +74,8 @@ $(document).ready(function () {
   });
 
   // gamestart 버튼 클릭 시
-  $(".menu-btn")
-    .eq(0)
-    .on("click", function () {
-      $("#start-wrapper").hide();
-      $("#setting-wrapper").hide();
-      $("#level").hide();
-      $("#game").hide();
-      $("#story").show();
-
-      const storyImages = [
-        "story1.png",
-        "story2.png",
-        "story3.png",
-        "story4.png",
-        "story5.png",
-        "story6.png",
-        "story7.png",
-        "story8.png",
-        "story9.png",
-      ];
-
-      $("#story").css("background-image", `url(${storyImages[story]})`);
-      $("#story").fadeIn(1000);
-      story++;
-
-      storyInterval = setInterval(() => {
-        $("#fade-overlay").css("opacity", 1);
-
-        setTimeout(() => {
-          if (story < storyImages.length) {
-            $("#story").css("background-image", `url(${storyImages[story]})`);
-            story++;
-            $("#fade-overlay").css("opacity", 0);
-          } else {
-            clearInterval(storyInterval);
-            $("#fade-overlay").css("opacity", 1);
-            setTimeout(() => {
-              $("#story").hide();
-              $("#fade-overlay").css("opacity", 0);
-              $("#level").show();
-            }, 1000);
-          }
-        }, 700);
-      }, 4000);
-    });
-
-  // Skip 버튼 눌렀을 때 스토리 스킵
-  $("#skip").on("click", function () {
-    clearInterval(storyInterval);
-    $("#story").hide();
-    $("#fade-overlay").css("opacity", 0);
-    $("#level").show();
+  $(".menu-btn").eq(0).on("click", function () {
+  window.location.href = "story.html";
   });
 });
 

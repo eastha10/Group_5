@@ -5,7 +5,7 @@ body {
   font-family: 'Press Start 2P', cursive;
 }
 
-#ending-container {
+#story-container {
   width: 100vw;
   height: 100vh;
   text-align: center;
@@ -19,13 +19,13 @@ body {
   margin: 0 auto 40px auto;
 }
 
-#ending-image {
+#story-image {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-#ending-text {
+#story-text {
   width: 80%;
   margin: 0 auto;
   font-size: 22px;
@@ -41,8 +41,4 @@ body {
   height: 48px;
   cursor: pointer;
   z-index: 999;
-}
-
-#ending-text {
-  white-space: pre-line;
 }
