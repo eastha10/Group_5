@@ -109,6 +109,15 @@ $(document).ready(function () {
 
     window.location.href = "story.html";
   });
+
+  // 스토리 끝나고 game.html#level로 돌아온 경우 → 음악 자동 재생
+  if (window.location.hash === "#level") {
+    const savedMusic = localStorage.getItem("music");
+    if (savedMusic !== null) {
+      music = parseInt(savedMusic);
+      MusicChange();
+    }
+  }
 });
 
 function JobChange() {
@@ -134,10 +143,28 @@ function SkinChange() {
   }
 }
 
+// 음악 재생 함수 개선됨
 function MusicChange() {
   const src = `${bgmTracks[music]}.mp3`;
-  $("#bgm").attr("src", src)[0].play();
+  const bgm = document.getElementById("bgm");
+
+  if (!bgm) return;
+
+  // 같은 음악이면 재설정하지 않음
+  if (!bgm.src.includes(src)) {
+    bgm.pause();
+    bgm.src = src;
+  }
+
+  // 재생 시도
+  bgm.play().catch(() => {
+    document.body.addEventListener("click", () => {
+      bgm.play();
+    }, { once: true });
+  });
+
   $(".bgm-name").text(bgmTracks[music].replace(/-/g, " "));
+  localStorage.setItem("music", music);
 }
 
 function CastleChange() {
