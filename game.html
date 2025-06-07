@@ -98,10 +98,18 @@
 
   <!-- UI: 생명/웨이브 정보 -->
   <div id="ui">
-    ❤️ 생명: <span id="life">-</span>  |  🌊 웨이브: <span id="wave">-</span>  |  🌀 스킬: <span id="skill-status">대기중</span>
+    ❤️ 생명: <span id="life">-</span> <br>
+    🌊 웨이브: <span id="wave">-</span> <br>
+    🕛 시간: <span id ="time">0초</span> <br>
+    🌀 스킬: <span id="skill-status">대기중</span>
   </div>
 
   <!-- 실제 게임을 그릴 캔버스 -->
   <canvas id="gameCanvas"></canvas>
+  <div id="clear-popup">
+  <h2 id="clear-message"></h2>
+  <p id="clear-score"></p>
+  <button id="next-button">확인</button>
+</div>
 </body>
 </html>

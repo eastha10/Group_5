@@ -78,10 +78,7 @@ function nextSlide() {
 
 function skipSlides() {
   clearInterval(typingInterval);
-  slideIndex = slides.length - 1;
-  textBox.textContent = slides[slideIndex].text;
-  slideImage.src = slides[slideIndex].image;
-  typingIndex = slides[slideIndex].text.length;
+  window.location.href = "game.html";
 }
 
 window.onload = typeSlide;

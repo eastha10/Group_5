@@ -297,3 +297,24 @@ body {
   margin-left: 70px;
   width: 500px;
 }
+#clear-popup {
+  display: none;
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 30px;
+  border: 3px solid black;
+  text-align: center;
+  z-index: 9999;
+  font-family: "Press Start 2P", cursive;
+  border-radius: 10px;
+  box-shadow: 0 0 20px black;
+  background: #fffacd;
+}
+#next-button {
+  margin-top: 20px;
+  padding: 10px 30px;
+  font-size: 1.2em;
+  cursor: pointer;
+}
