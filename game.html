@@ -79,9 +79,6 @@
     </div>
   </div>
 
-  <!-- STORY 화면 -->
-  <div id="story"><button id="skip">skip</button></div>
-
   <!-- 페이드 오버레이 (스토리 전환 시 사용) -->
   <div id="fade-overlay"></div>
 
@@ -98,10 +95,18 @@
 
   <!-- UI: 생명/웨이브 정보 -->
   <div id="ui">
-    ❤️ 생명: <span id="life">-</span> <br>
-    🌊 웨이브: <span id="wave">-</span> <br>
-    🕛 시간: <span id ="time">0초</span> <br>
-    🌀 스킬: <span id="skill-status">대기중</span>
+    <div class="ui-element">
+      ❤️ 생명: <span id="life">-</span> <br>
+    </div>
+    <div class="ui-element">
+      🌊 웨이브: <span id="wave">-</span> <br>
+    </div>
+    <div class="ui-element">
+      🕛 시간: <span id ="time">0초</span> <br>
+    </div>
+    <div class="ui-element">
+      🌀 스킬: <span id="skill-status">대기중</span>
+    </div>
   </div>
 
   <!-- 실제 게임을 그릴 캔버스 -->

@@ -318,3 +318,6 @@ body {
   font-size: 1.2em;
   cursor: pointer;
 }
+.ui-element {
+  margin-bottom: 20px;
+}
