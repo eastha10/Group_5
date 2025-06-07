@@ -42,3 +42,14 @@ body {
   white-space: pre-line;
   line-height: 1.8;
 }
+
+#bold-text {
+  font-weight: bold;
+  font-size: 40px;
+}
+
+#normal-text {
+  font-size: 22px;
+  white-space: pre-line;
+  line-height: 1.8;
+}

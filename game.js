@@ -18,7 +18,7 @@ let story = 0;
 let storyInterval;
 
 // 새로고침 시 localStorage 초기화
-if (performance.navigation.type === 1) {
+if (performance.getEntriesByType("navigation")[0]?.type === "reload") {
   // 새로고침 감지
   localStorage.clear();
 }
