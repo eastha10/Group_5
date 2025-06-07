@@ -199,7 +199,7 @@ function checkGameClear() {
     else message = "🎉 Hard 모드까지 클리어했습니다! 수고하셨습니다!";
 
     $("#clear-message").text(message);
-    $("#clear-score").html(`⏱ 시간: ${timeTaken}초<br❤️ 잃은 생명: ${lostLife}<br>🏆 점수: ${score}`);
+    $("#clear-score").html(`<br>⏱ 시간: ${timeTaken}초<br><br>❤️ 잃은 생명: ${lostLife} <br><br>🏆 점수: ${score}`);
     $("#clear-popup").show();
 
     // 버튼 클릭 처리
