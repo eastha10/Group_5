@@ -32,7 +32,7 @@ body {
   display: none;
   width: 100vw;
   height: 100vh;
-  background-image: url("level.svg");
+  background-image: url("level.png");
   background-size: cover;
   background-position: center;
   display: flex;

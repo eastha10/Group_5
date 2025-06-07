@@ -84,15 +84,15 @@ $(document).ready(function () {
       $("#story").show();
 
       const storyImages = [
-        "story1.svg",
-        "story2.svg",
-        "story3.svg",
-        "story4.svg",
-        "story5.svg",
-        "story6.svg",
-        "story7.svg",
-        "story8.svg",
-        "story9.svg",
+        "story1.png",
+        "story2.png",
+        "story3.png",
+        "story4.png",
+        "story5.png",
+        "story6.png",
+        "story7.png",
+        "story8.png",
+        "story9.png",
       ];
 
       $("#story").css("background-image", `url(${storyImages[story]})`);
